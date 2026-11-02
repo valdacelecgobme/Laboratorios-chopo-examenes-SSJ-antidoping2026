@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Validación — Laboratorio El Chopo</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; }
+        body { background: #f0f4f8; min-height: 100vh; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        
+        .login-card {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo-section {
+            background: linear-gradient(90deg, #00529B 0%, #0071BC 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .logo-section h1 { font-size: 24px; }
+        .logo-section p { font-size: 13px; opacity: 0.9; margin-top: 5px; }
+        .input-group { margin: 20px 0; }
+        label { display: block; font-weight: bold; color: #34495e; margin-bottom: 8px; text-align: left; }
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+        input:focus { outline: none; border-color: #00529B; }
+        button {
+            background: #00529B;
+            color: white;
+            border: none;
+            padding: 13px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+            width: 100%;
+        }
+        button:hover { background: #00407a; }
+
+        .message {
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            display: none;
+        }
+        .error { background: #fdecea; border-left: 4px solid #e74c3c; color: #c0392b; display: block !important; }
+        .success { background: #eafaf1; border-left: 4px solid #27ae60; color: #219653; }
+        .warning { background: #fff8e1; border-left: 4px solid #f39c12; color: #d35400; }
+
+        .document {
+            background: white;
+            display: none;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .doc-header {
+            background: linear-gradient(90deg, #00529B 0%, #0071BC 100%);
+            color: white;
+            padding: 25px 40px;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .doc-brand h2 { font-size: 22px; }
+        .doc-brand p { font-size: 12px; opacity: 0.9; margin-top: 4px; }
+        .doc-contact { font-size: 12px; line-height: 1.5; text-align: right; }
+        .divider-bar { height: 4px; background: linear-gradient(90deg, #FF6B00, #FF9500); }
+        .doc-meta {
+            background: #f8f9fa;
+            padding: 12px 40px;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .doc-content { padding: 30px 40px; }
+        .doc-section-title {
+            background: #f0f6fa;
+            padding: 10px 15px;
+            margin: 20px 0 10px;
+            border-left: 4px solid #00529B;
+            font-weight: bold;
+            color: #00529B;
+            font-size: 15px;
+        }
+        .doc-row {
+            display: flex;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+            flex-wrap: wrap;
+        }
+        .doc-label { font-weight: bold; color: #34495e; width: 200px; }
+        .doc-value { color: #2c3e50; flex: 1; }
+        .result-box {
+            background: #eafaf1;
+            border: 2px solid #2ecc71;
+            border-radius: 8px;
+            padding: 25px;
+            text-align: center;
+            margin: 25px 0;
+        }
+        .result-text { font-size: 42px; font-weight: bold; color: #27ae60; letter-spacing: 3px; }
+        .result-sub { font-size: 15px; color: #2d3436; margin-top: 8px; }
+        .folio-box {
+            background: #e8f4fc;
+            padding: 10px 15px;
+            border-radius: 5px;
+            display: inline-block;
+            font-family: monospace;
+            font-weight: bold;
+            color: #00529B;
+            margin-bottom: 15px;
+        }
+        .validation-box {
+            background: #fef8e8;
+            border: 1px dashed #f5a623;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 25px;
+        }
+        .validation-code {
+            font-family: "Courier New", monospace;
+            font-size: 14px;
+            background: white;
+            padding: 10px;
+            border: 1px solid #ddd;
+            margin-top: 8px;
+            letter-spacing: 1px;
+        }
+        .doc-footer {
+            border-top: 1px solid #ddd;
+            padding: 15px 40px 25px;
+            text-align: center;
+            font-size: 11px;
+            color: #666;
+        }
+        .btn-secondary {
+            background: #95a5a6;
+            margin-top: 15px;
+        }
+        .btn-secondary:hover { background: #7f8c8d; }
+        
+        @media print {
+            .login-card, .message, button, .btn-secondary { display: none !important; }
+            .document { display: block !important; box-shadow: none; }
+            body { background: white; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="login-card" id="searchPanel">
+        <div class="logo-section">
+            <h1>LABORATORIO EL CHOPO</h1>
+            <p>Sistema de Consulta de Resultados — Sucursal Los Filtros, Córdoba, Ver.</p>
+        </div>
+
+        <h3>🔍 Consulta de Resultados por Folio</h3>
+        <p style="color:#666; font-size:14px; margin:10px 0 25px;">Ingresa tu número de folio para consultar el expediente</p>
+
+        <div class="input-group">
+            <label for="folioInput">Número de Folio / Expediente</label>
+            <input type="text" id="folioInput" placeholder="Ej: CHP-2026-001" autocomplete="off">
+        </div>
+
+        <button onclick="buscarFolio()">📋 Consultar Resultado</button>
+        <div id="messageBox" class="message"></div>
+    </div>
+
+    <div class="document" id="resultDocument">
+        <div class="doc-header">
+            <div class="doc-brand">
+                <h2>LABORATORIO EL CHOPO</h2>
+                <p>Sucursal Los Filtros • Córdoba, Veracruz</p>
+            </div>
+            <div class="doc-contact">
+                <strong>Domicilio:</strong><br>
+                Calle Clavel #13<br>
+                Col. Los Filtros, C.P. 94470<br>
+                Córdoba, Veracruz, México<br>
+                <strong>Teléfono:</strong> (271) 123 4567
+            </div>
+        </div>
+
+        <div class="divider-bar"></div>
+
+        <div class="doc-meta">
+            <div>
+                <strong>📅 Fecha de emisión:</strong> <span id="docFecha"></span> — <span id="docHora"></span>
+            </div>
+            <div><strong>♾️ Sin vencimiento</strong></div>
+        </div>
+
+        <div class="doc-content">
+            <div class="folio-box">📄 FOLIO: <span id="docFolio"></span></div>
+
+            <div class="doc-section-title">👤 Datos del Paciente / Atleta</div>
+            <div class="doc-row">
+                <span class="doc-label">Nombre completo:</span>
+                <span class="doc-value" id="docNombre"></span>
+            </div>
+            <div class="doc-row">
+                <span class="doc-label">CURP:</span>
+                <span class="doc-value" id="docCurp"></span>
+            </div>
+            <div class="doc-row">
+                <span class="doc-label">Fecha de nacimiento:</span>
+                <span class="doc-value" id="docNacimiento"></span>
+            </div>
+
+            <div class="doc-section-title">📋 Información del Estudio</div>
+            <div class="doc-row">
+                <span class="doc-label">Tipo de examen:</span>
+                <span class="doc-value" id="docEstudio"></span>
+            </div>
+            <div class="doc-row">
+                <span class="doc-label">Tipo de muestra:</span>
+                <span class="doc-value" id="docMuestra"></span>
+            </div>
+            <div class="doc-row">
+                <span class="doc-label">Normativa:</span>
+                <span class="doc-value" id="docNorma"></span>
+            </div>
+
+            <div class="result-box">
+                <div class="result-text" id="docResultado"></div>
+                <div class="result-sub" id="docSubResultado"></div>
+            </div>
+
+            <div class="validation-box">
+                <strong>🔐 Código de Validación Única:</strong>
+                <div class="validation-code" id="docCodigo"></div>
+                <p style="font-size:12px; color:#7f8c8d; margin-top:8px;">
+                    Este código valida la autenticidad del documento. Si se modifica cualquier dato, el código cambia.
+                </p>
+            </div>
+
+            <button class="btn-secondary" onclick="cerrarDocumento()">← Consultar otro Folio</button>
+            <button onclick="window.print()" style="margin-top:10px;">🖨️ Imprimir Documento</button>
+        </div>
+
+        <div class="doc-footer">
+            <p><strong>Laboratorio El Chopo</strong> • Calle Clavel #13, Col. Los Filtros, C.P. 94470, Córdoba, Veracruz</p>
+            <p>www.chopo.com.mx • Atención al cliente: 55 1104 4880</p>
+        </div>
+    </div>
+
+</div>
+
+<script>
+const baseDatos = {
+    "CHP-2026-001": {
+        folio: "CHP-2026-001",
+        nombre: "Sergio Jiménez Sánchez",
+        curp: "SAJS940918HVZNM07",
+        nacimiento: "18 de septiembre de 1994",
+        estudio: "Prueba Antidopaje — Pantalla Completa",
+        muestra: "Orina",
+        norma: "Código Mundial Antidopaje / AMA",
+        resultado: "NEGATIVO",
+        subResultado: "No se detectaron sustancias prohibidas"
+    },
+    "CHP-2026-002": {
+        folio: "CHP-2026-002",
+        nombre: "María López Hernández",
+        curp: "LOHM900315MVZPR02",
+        nacimiento: "15 de marzo de 1990",
+        estudio: "Perfil de Química Sanguínea",
+        muestra: "Sangre",
+        norma: "Normas Oficiales Mexicanas NOM-008-SSA2-2017",
+        resultado: "DENTRO DE RANGOS",
+        subResultado: "Valores dentro de los límites de referencia"
+    },
+    "CHP-2026-003": {
+        folio: "CHP-2026-003",
+        nombre: "Juan Pérez Martínez",
+        curp: "PEMJ851205HVZRN09",
+        nacimiento: "05 de diciembre de 1985",
+        estudio: "Examen General de Orina",
+        muestra: "Orina",
+        norma: "Normas Oficiales Mexicanas",
+        resultado: "SIN ALTERACIONES",
+        subResultado: "No se observan alteraciones significativas"
+    }
+};
+
+function formatearFecha(fecha) {
+    return fecha.toLocaleDateString('es-MX', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+}
+
+function formatearHora(fecha) {
+    return fecha.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+
+function generarCodigoValidacion(datos) {
+    const fechaStr = new Date().toISOString().slice(0,10).replace(/-/g,'');
+    const base = `${datos.folio}|${datos.nombre}|${datos.resultado}`;
+    let hash = 0;
+    for (let i = 0; i < base.length; i++) {
+        const char = base.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash;
+    }
+    const hashStr = Math.abs(hash).toString(36).toUpperCase().padStart(8, '0');
+    return `CHOPO-${fechaStr}-${hashStr}`;
+}
+
+function mostrarMensaje(texto, tipo) {
+    const caja = document.getElementById('messageBox');
+    caja.style.display = 'block';
+    caja.className = 'message ' + tipo;
+    caja.innerHTML = texto;
+}
+
+function buscarFolio() {
+    const folioIngresado = document.getElementById('folioInput').value.trim().toUpperCase();
+    const cajaMensaje = document.getElementById('messageBox');
+
+    if (!folioIngresado) {
+        mostrarMensaje('⚠️ <strong>Ingresa un número de folio</strong> para realizar la búsqueda.', 'warning');
+        return;
+    }
+
+    if (baseDatos.hasOwnProperty(folioIngresado)) {
+        const expediente = baseDatos[folioIngresado];
+        mostrarExpediente(expediente);
+    } else {
+        mostrarMensaje(`❌ <strong>Folio "${folioIngresado}" NO encontrado</strong><br>
+        Verifica que hayas escrito correctamente el número de folio.<br>
+        <em>Ejemplos válidos: CHP-2026-001, CHP-2026-002, CHP-2026-003</em>`, 'error');
+    }
+}
+
+function mostrarExpediente(datos) {
+    const ahora = new Date();
+    
+    document.getElementById('docFolio').textContent = datos.folio;
+    document.getElementById('docFecha').textContent = formatearFecha(ahora);
+    document.getElementById('docHora').textContent = formatearHora(ahora);
+    document.getElementById('docNombre').textContent = datos.nombre;
+    document.getElementById('docCurp').textContent = datos.curp;
+    document.getElementById('docNacimiento').textContent = datos.nacimiento;
+    document.getElementById('docEstudio').textContent = datos.estudio;
+    document.getElementById('docMuestra').textContent = datos.muestra;
+    document.getElementById('docNorma').textContent = datos.norma;
+    document.getElementById('docResultado').textContent = datos.resultado;
+    document.getElementById('docSubResultado').textContent = datos.subResultado;
+    document.getElementById('docCodigo').textContent = generarCodigoValidacion(datos);
+
+    document.getElementById('searchPanel').style.display = 'none';
+    document.getElementById('resultDocument').style.display = 'block';
+    document.getElementById('messageBox').style.display = 'none';
+}
+
+function cerrarDocumento() {
+    document.getElementById('searchPanel').style.display = 'block';
+    document.getElementById('resultDocument').style.display = 'none';
+    document.getElementById('folioInput').value = '';
+    document.getElementById('messageBox').style.display = 'none';
+}
+</script>
+
+</body>
+  </html>
+  
